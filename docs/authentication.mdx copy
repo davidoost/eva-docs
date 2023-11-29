@@ -1,0 +1,152 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Authentication
+
+Authentication for requests is provided in the `Authorization` header as a token, with or without a Bearer prefix.
+
+In order to properly authorize ourselves, we need three things;
+
+1. API User
+2. API Key
+3. Appropriate role
+
+## API User
+
+API users can be created using [CreateApiUser](https://dora.on-eva.io/CreateApiUser):
+
+<Tabs>
+<TabItem value="json1" label="CreateApiUser">
+
+```json
+{
+  "User": {
+      "Name": "AdyenApiUser",
+      "NickName": "Adyen",
+  }
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{
+    "ID": 45,
+    "Result": 0
+}
+```
+
+</TabItem>
+</Tabs>
+
+This service returns the `UserID` for your newly created user. `Result` can be one of two things:
+- `0` = CreatedApiUser
+- `1` = NicknameInUse
+
+:::note 
+If you set up requirements such as **EmailAdress** or **LastName** for user creation, these will not apply to API Users.
+:::
+
+## API keys
+
+To fetch our token, we need to a key for our newly created API User using `CreateApiKey`:
+
+<Tabs>
+<TabItem value="json1" label="CreateApiKey">
+
+```json
+{
+    "UserID": 45,
+    "OrganizationUnitID": 23,
+    "RequestPermanentApiKey": true
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{
+    "ApiKey": "*****"
+}
+```
+
+</TabItem>
+</Tabs>
+
+Needless to say; a token is only valid for the single environment it was created or requested on.
+
+To list all API keys for a specific user, use [ListUserApiKeys](https://dora.on-eva.io/ListUserApiKeys):
+
+<Tabs>
+<TabItem value="json1" label="ListUserApiKeys">
+
+```json
+{
+  "UserID": 45
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{
+  "Result": {
+    "PageConfig": {
+      "Filter": {},
+      "Start": 0,
+      "Limit": 2147483647,
+      "SortDirection": 0
+    },
+    "Page": [
+      {
+        "ID": 43,
+        "UserID": 45
+      },
+      {
+        "ID": 44,
+        "UserID": 45
+      }
+    ],
+    "Offset": 0,
+    "Limit": 2147483647,
+    "Total": 2,
+    "SortDirection": 0,
+    "Filters": {},
+    "NumberOfPages": 1,
+    "CurrentPage": 1
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+This returns a list of API keys. It does not return their values, but their ID's. You can see we have two API keys for this user. That's because we created an additional one, so we can delete the key that we have so blatantly pasted into our docs. To delete an API key, call [DeleteApiKey](https://dora.on-eva.io/DeleteApiKey) using the desired key's ID.
+
+<Tabs>
+<TabItem value="json1" label="DeleteApiKey">
+
+```json
+{
+  "KeyID": 43
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{}
+```
+
+</TabItem>
+</Tabs>
+
+When successful, this service returns an empty response.
+
+## Setting the appropriate role
+
+As with any user, we should set up a proper role for the operations the API user will perform. 

@@ -1,0 +1,84 @@
+---
+title: Introduction
+---
+
+import LinkCardComponent from "/src/components/docs/LinkCardComponent.tsx";
+import LinkCardWrapper from "/src/components/docs/LinkCardWrapper.tsx";
+
+import {DocsHeadingIconComponent} from "@site/src/components/docs/DocsHeadingIconComponent"
+
+<DocsHeadingIconComponent
+  title="EVA developer 101"
+  iconUrl="/img/icons/other/dev.svg"
+  description="What you need to know before touching Core"
+/>
+
+**Any operation in EVA is essentially just a simple message that's sent to EVA Core, which then sends a response. In this introduction, we will be sending out our first request and explaining some things along the way.**
+
+## Endpoint
+
+First off, we need an EVA environment we can send the message to. This environment is represented by a certain endpoint. Endpoints are customer specific but generally look something like:
+
+-  `https://api.xxxxxxx.eva-online.cloud`
+
+EVA comes with an incredible number of services, somewhere upwards of 1700. When making a request using any of these messages, we should specify what message we are actually trying to send. To do so, we will suffix this specification to our endpoint. For example, a simple product search request would be sent to:
+
+- `https://api.xxxxxxx.eva-online.cloud/message/ping`
+
+## Message
+
+Now for the actual message. You can call EVA with a simple [HTTPS POST](https://www.w3schools.com/tags/ref_httpmethods.asp) message with [JSON](https://www.w3schools.com/js/js_json_intro.asp) serialized content, using [TLS 1.2](https://en.wikipedia.org/wiki/Transport_Layer_Security) or above.
+
+For our first ever message, we will be calling the `Ping` service. This service accepts an empty body:
+
+```json title="POST https://api.xxxxxxx.eva-online.cloud/message/ping"
+{}
+```
+
+There's just one thing we are missing. Well, actually two things.
+
+## Headers
+
+Before we can make our first request, we have two include the two headers that are mandatory in EVA;
+
+| Header Name | Value |
+|--|--|
+| `EVA-User-Agent` | Identifier for the application you're sending the message from. E.g. `ApplicationName/1.0`. |
+| `Content-Type`   | The value for this should be `application/json` to indicate we are sending JSON content. |
+
+Additionally, we need certain headers and correct authentication.
+
+For more information on possible headers, see [Request headers](/documentation/dev/101/headers#request-headers). 
+
+## First request
+
+Now that everything is in place for our first request, we can send it out:
+
+```json title="POST https://api.xxxxxxx.eva-online.cloud/message/ping"
+{}
+```
+
+We will get the following response:
+
+```json
+{
+	"Error": {
+		"Message": "You are not authorized to execute this request.",
+		"Type": "Forbidden",
+		"Code": "BBHSOCV",
+		"RequestID": "2b8ed8f38df23d1dd651923f3e7bdd8f"
+	}
+}
+```
+
+We get this response, because we do not have the proper authorization to perform this request. The request in itself was correct, we just haven't authenticated ourselves. We have of course totally intentionally set you up with a request that requires authentication so we could grasp your attention for our next subject; Authentication. Surprise.
+
+## Authentication
+
+Even though some services can be called without authentication, most of the time it is mandatory to authenticate yourself. We authenticate ourselves by providing a token in the `Authentication` header. Read the [Authentication documentation](/documentation/dev/101/authentication) to find out how to acquire a token.
+
+## Changes
+
+Requests and responses may gain additional properties without prior notice!
+
+EVA will include a EVA-Warning header with details on calls that are not optimal - you may be using a deprecated service, missing a certain property, using an inefficient property, or anything else suboptimal. Warnings will turn into actual errors later, so you should catch this response header and follow up on them to ensure a continued operation.

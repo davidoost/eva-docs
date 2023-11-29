@@ -1,0 +1,500 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Problem indicators
+
+To facilitate the creation and management of custom problem indicators, allowing you to indicate any number of problems with your environment, OUs, Orders, etc., there's several services available for fine-tuning. 
+
+:::note Permissions
+The **Monitors** permission is required in order to be able to see the Monitors dashboard, with the **MonitorNotifications** required for the alerts.
+:::
+
+## Overview of all related services
+
+<Tabs>
+<TabItem value="CRUD" label="CRUD services">
+
+| Service        |
+| ----------- |  
+| CreateMonitor |  
+| UpdateMonitor |  
+| DeleteMonitor |  
+
+
+</TabItem>
+<TabItem value="owners" label="Owners">
+
+| Service        |
+| ----------- |
+| CreateMonitorUserOwner |  
+| DeleteMonitorUserOwner |  
+| CreateMonitorRoleOwner |  
+| DeleteMonitorRoleOwner |  
+
+
+</TabItem>
+<TabItem value="handlers" label="Handlers">
+
+| Service        |  
+| ----------- |
+| GetAvailableMonitorHandlers |  
+| GetAvailableConditionsForMonitorHandler |  
+
+</TabItem>
+<TabItem value="monitors" label="Monitors">
+
+| Service        |  
+| ----------- |  |
+| GetUserMonitors |  
+| GetMonitorResults |  
+| RunMonitor |  
+
+</TabItem>
+<TabItem value="alerts" label="Alerts">
+
+| Service        |  Description       |
+| ----------- | 
+| CreateMonitorAlert |  
+| DeleteMonitorAlert |  
+| GetMonitorAlert |  
+| GetMonitorAlerts |  
+
+
+</TabItem>
+<TabItem value="email" label="Email alerts">
+
+| Service        |  
+| ----------- |  
+| CreateMonitorAlertEmailRecipient |  
+| GetMonitorAlertEmailRecipient |  
+| GetMonitorAlertEmailRecipients |  
+| DeleteMonitorAlertEmailRecipient |  
+
+</TabItem>
+</Tabs>
+
+## CRUD services for monitors
+
+
+<Tabs>
+<TabItem value="json1" label="CreateMonitor">
+
+```json
+{
+    "Handler": "SettingVulnerabilities",
+    "Name": "SettingVulnerabilities",
+    "Description": "Monitor vulnerable settings",
+    "DefaultLevel": 1,
+    "ScriptID": 5
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{
+    "ID": 2
+}
+```
+
+</TabItem>
+<TabItem value="json3" label="UpdateMonitor">
+
+```json
+{
+    "ID": 1,
+    "Handler": "SettingVulnerabilities",
+    "Name": "SettingVulnerabilities - updated",
+    "Description": "Monitor vulnerable settings - updated",
+    "DefaultLevel": 0,
+    "ScriptID": 5
+}
+
+```
+
+</TabItem>
+<TabItem value="json4" label="Response">
+
+```json
+{
+  // Response is empty when successful
+}
+```
+
+</TabItem>
+<TabItem value="json5" label="DeleteMonitor">
+
+```json
+{
+    "ID": 1
+}
+
+```
+
+</TabItem>
+<TabItem value="json6" label="Response">
+
+```json
+{
+  // Response is empty when successful
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+The possible types set in the **DefaultLevel** property in the services above are: 
+
+- 0: Info 
+- 1: Warning
+- 2: Error 
+- 3: Fatal
+
+Some monitors can be configured by setting the Data property in `CreateMonitor` and `UpdateMonitor`.
+
+
+## Monitor configuration
+
+### Check if conditions are available per handler
+
+The main configuration option is to set conditions. First run `GetAvailableMonitorHandlers` to check if conditions are available for the handler. 
+
+<Tabs>
+<TabItem value="json1" label="GetAvailableMonitorHandlers">
+
+```json
+{
+ // Request can be left empty
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{
+	"Handlers": [
+		{
+			"Name": "ValidateAuditingConfiguration",
+			"SupportsConditions": false
+		},
+		{
+			"Name": "TransputJobs",
+			"SupportsConditions": true
+		},
+		{
+			"Name": "SettingVulnerabilities",
+			"SupportsConditions": false
+		},
+		{
+			"Name": "ScriptedOrders",
+			"SupportsConditions": false,
+			"ScriptingExtensionType": "OrdersMonitor"
+		},
+		{
+			"Name": "OrganizationUnits",
+			"SupportsConditions": true
+		},
+		{
+			"Name": "Orders",
+			"SupportsConditions": true
+		},
+		{
+			"Name": "EventExports",
+			"SupportsConditions": true
+		},
+		{
+			"Name": "ReplenishmentProposals",
+			"SupportsConditions": true
+		}
+	]
+}
+```
+
+</TabItem>
+</Tabs>
+
+The *ScriptedOrders* monitor takes the customization of order monitors to a whole new level. For more information, see [Orders Monitor](/documentation/documentation/scripting/scripting-extension-points#orders-monitor). 
+
+### Get which conditions are available per handler
+
+<Tabs>
+<TabItem value="json1" label="GetAvailableConditionsForMonitorHandler">
+
+```json
+{
+    "Handler": "TransputJobs"
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{
+    "AvailableConditions": [
+        {
+            "Name": "Name",
+            "ValueOperators": [
+                "Contains",
+                "Equals",
+                "EndsWith",
+                "StartsWith",
+                "NotEquals",
+                "DoesNotContain",
+                "DoesNotStartWith",
+                "DoesNotEndWith"
+            ]
+        },
+        {
+            "Name": "TypeID",
+            "ValueOperators": [
+                "Equals",
+                "NotEquals",
+                "EqualsNull",
+                "NotEqualsNull"
+            ]
+        },
+        ...
+    ]
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Setting conditions for monitors
+
+You can set conditions for monitors by setting the **MainConditionGroup** property in the **Data** property in either `CreateMonitor` or `UpdateMonitor`.
+
+This is the format of a *ConditionGroup*:
+
+```json
+{
+    "MatchAny": bool,
+    "Conditions": Condition[]
+    "Groups": ConditionGroup[]
+}
+```
+
+The format of a *Condition*:
+
+```json
+{
+    "Field": string,
+    "ValueOperator": string,
+    "Value": string
+}
+```
+
+With the **MatchAny** property you can define whether all conditions should be valid or not.
+
+So, for example, to create a monitor that seeks all failed transput jobs for order/shipment RGC exports, we can call `CreateMonitor` as follows:
+
+<Tabs>
+<TabItem value="json1" label="CreateMonitor">
+
+```json
+{
+    "Handler": "TransputJobs",
+    "Name": "Failed RGC",
+    "Description": "Monitor for failed RGC exports",
+    "DefaultLevel": "Error",
+    "Data": {
+        "MainConditionGroup": {
+            "MatchAny": false,
+            "Conditions": [
+                {"Field": "Name", "ValueOperator": "Contains", "Value": "RGC"},
+                {"Field": "StatusID", "ValueOperator": "Equals", "Value": "-1"}
+            ],
+            "Groups": [
+                {
+                    "MatchAny": true,
+                    "Conditions": [
+                        {"Field": "TypeID", "ValueOperator": "Equals", "Value": "1"},
+                        {"Field": "TypeID", "ValueOperator": "Equals", "Value": "2"}
+                    ]
+                },
+                {
+                    "MatchAny": true,
+                    "Conditions": [
+                        {"Field": "DaysOld", "ValueOperator": "LessThan", "Value": 10},
+                        {"Field": "DaysOld", "ValueOperator": "Equals", "Value": 10}
+                    ]
+                }
+            ]
+        }
+    }
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{
+    "ID": 2
+}
+```
+</TabItem>
+</Tabs>
+
+Query-like: 'all transput jobs where name contains RGC and status is failed and (type is orders or shipments) and (days old is less than 10 or equal to 10)'
+
+
+## Monitor owners
+
+You can specify if a role is only able to view or view + edit a specific monitor by enabling the **IsAllowedToEdit** property in the `CreateMonitorRoleOwner` service. Enabling this will mean the role can edit that specific Monitor even when the *Edit* permission of the **Monitors** [functionality](/documentation/documentation/users-permissions/roles-and-rights#functionalities) is disabled. 
+
+<Tabs>
+<TabItem value="json1" label="CreateMonitorRoleOwner">
+
+```json
+{
+	"MonitorID":20,
+    "RoleID": 1,
+    "IsAllowedToEdit":true
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Running monitors
+
+A Monitor can be run by manually calling `RunMonitor` or by creating a recurring task, such as `RunTaskPlugin`.
+
+<Tabs>
+<TabItem value="json1" label="RunMonitor">
+
+```json
+{
+    "ID": 2
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="RunTaskPlugin">
+
+```json
+{
+    "Name": "RunMonitor",
+    "Parameters": {
+        "MonitorID": 2
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Getting monitor results
+
+Call `GetMonitorResults` to fetch the latest results for all monitors.
+
+<Tabs>
+<TabItem value="json1" label="GetMonitorResults">
+
+```json
+{
+ // Empty request
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{
+    "Results": [
+        {
+            "Monitor": {
+                "Name": "SettingVulnerabilities",
+                "Description": "Monitor vulnerable settings",
+                "DefaultLevel": "Info"
+            },
+            "LastRun": "2022-04-21T10:37:38.9Z",
+            "LastResult": {
+                "Vulnerabilities": [
+                    {
+                        "OrganizationUnitID": 1,
+                        "Key": "Adyen:HmacKeys",
+                        "Value": null,
+                        "CheckWhen": "Null",
+                        "CheckValue": null
+                    },
+                    {
+                        "OrganizationUnitID": 1,
+                        "Key": "Adyen:EnableExtendedUserValidation",
+                        "Value": false,
+                        "CheckWhen": "Value",
+                        "CheckValue": false
+                    }
+                ]
+            }
+        }
+    ]
+}
+
+```
+
+</TabItem>
+</Tabs>
+
+The content of 'LastResult' varies by handler and is therefore not typed. How each handler stores information will be documented later.
+
+## Monitor alerts
+
+The first step to creating the alert itself, via `CreateMonitorAlert`.
+
+<Tabs>
+<TabItem value="json1" label="CreateMonitorAlert">
+
+```json
+{
+    "MonitorID": "1",
+    "Level": "Warning",
+	"Threshold":"5",
+	"Description":"If more than 5 warnings available, sound the alarm!",
+	"EmailSubject":"5 or more monitor warnings"
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{
+	"ID": 2
+}
+```
+
+</TabItem>
+</Tabs>
+
+With this ID from the above service, you can call `CreateMonitorAlertEmailRecipient` to set an email address for the warning to be sent out to.
+
+<Tabs>
+<TabItem value="json1" label="CreateMonitorAlertEmailRecipient">
+
+```json
+{
+    "AlertID": "2",
+    "Name": "Pedro",
+	"EmailAdress":"pedro@docs-inc.org",
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{
+	"ID": 1
+}
+```
+
+</TabItem>
+</Tabs>

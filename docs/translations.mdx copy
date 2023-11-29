@@ -1,0 +1,93 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Translations
+
+## ReplaceEntityTranslation
+
+Translations can be made by means of the standard translation service: `ReplaceEntityTranslation`. 
+
+Below you can find an example of such a translation, specified for the ReturnableStatusReason:
+
+<Tabs>
+<TabItem value="json1" label="ReplaceEntityTranslation">
+
+```json
+{
+    "EntityID": "Cancelled",
+    "EntityType": "ReturnableStatusReason",
+    "EntityField": "Reason",
+    "LanguageID": "nl",
+    "Value": "Regel is geannuleerd"
+}
+```
+
+</TabItem>
+<TabItem value="json2" label="Response">
+
+```json
+{
+
+}
+```
+
+</TabItem>
+</Tabs>
+
+This example shows how the Dutch translation will be shown in the Reason field in the response of `GetReturnableStatusForOrder`.
+
+
+| Code | Default translation |
+| ---- | ---- |
+| IsReturnLine | Is return line |
+| NotShipped | Not shipped |
+| AlreadyReturned | Already returned  |
+| Cancelled | Cancelled |
+| Unspecified | Unspecified |
+| OfflineMode | Offline mode can't determine returnable status |
+| DiscountsAreReturnedAutomatically | Discounts are returned automatically |
+| ReturnedAutomatically | Are returned automatically |
+| NotShippedAndNotInvoiced | Not shipped and not invoiced |
+| ReturnablePeriodExpired | Returnable period is expired |
+| ProductMarkedNonReturnable | Product is marked as non-returnable |
+| CanOnlyBeReturnedTo | This line can only be returned in the return organizationunit: %OrganizationUnitName% |
+| CanOnlyBeReturnedToOriginalStore | This line can only be returned in the original store: %OrganizationUnitName% |
+| CrossBorderNotAllowed | Cross-border returns are not allowed by configuration |
+| ReturnsShouldBeCreatedInGoogleExpress | Returns should be created in Google Express |
+
+
+As you can see, the `GetReturnableStatusForOrder` has two reasons which mention an organization unit:
+
+`CanOnlyBeReturnedTo` - default translation: This line can only be returned in the return organizationunit: %OrganizationUnitName%
+
+`CanOnlyBeReturnedToOriginalStore` - default translation: This line can only be returned in the original store: %OrganizationUnitName%
+
+So for translations, the placeholder `%OrganizationUnit%` can be used.
+
+Available placeholders:
+
+- OrganizationUnit (for above-mentioned reasons)
+
+- ReasonCode (always available)
+
+### Functionalities
+
+Translations can also be used for the Functionality descriptions.
+
+Example call to `ReplaceEntityTranslation`:
+
+```json
+{
+    "EntityID": "Settings",
+    "EntityType": "Functionality",
+    "EntityField": "Description",
+    "LanguageID": "NL",
+    "Value": "Instellingen"
+}
+```
+
+'EntityID' is filled with the name of the functionality. 
+
+
+
+

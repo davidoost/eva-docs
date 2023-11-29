@@ -1,0 +1,27 @@
+import RDimg from "/src/components/docs/rounded.tsx";
+
+# DORA
+
+**[DORA](https://dora.on-eva.io) is our API test application or 'service explorer'. It is a valuable asset when setting up a new connection to EVA or when trying out specific services.**
+
+When opening DORA for the first-time, you will be greeted with the following screen where you are asked to connect to an endpoint:
+
+<RDimg screenshot="/img/docs/manuals/dora/service-tester.png"/>
+
+## Connecting your endpoint
+
+You need DORA to point to the correct endpoint so that any services performed do actually impact on your environment. To set that up, either use `CMD/CTRL + P` or click the endpoint bar in the bottom left corner of the screen. If it's your first-time on DORA then you'll automatically be prompted with the above screenshot where that can be done.
+
+<RDimg screenshot="/img/docs/manuals/dora/endpoint-setup.png"/>
+
+## Logging in
+
+After specifying your desired endpoint, you need to log in using valid credentials for that environment.
+
+<RDimg screenshot="/img/docs/manuals/dora/login.png"/>
+
+## Performing requests
+
+After logging in, you can search through all of our services. You can use these services with our code editor (JS or JSON) or form inputs.
+
+<RDimg screenshot="/img/docs/manuals/dora/pushuser.png"/>

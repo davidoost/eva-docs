@@ -1,0 +1,43 @@
+import RDimg from "/src/components/docs/rounded.tsx";
+
+# Integration dashboard
+
+**The EVA integration dashboard is a place for your organization to monitor the health of your applications and integrations. Contrary to all of our other applications, the integration dashboard is not linked to a specific instance of EVA. This dashboard is related to you as a customer. You probably have multiple instances of EVA, this dash will include all your environments.** 
+
+## Access
+
+Since this dashboard is environment-transcending, we can't use EVA credentials for logging in. Because of this, we have created specific tokens for specific customers. You can access the dashboard through:
+
+- `https://integrations.on-eva.io/?token=yourtokenhere`
+
+:::info Note
+You can request your token with your Strategic Lead / Customer Manager.
+:::
+
+## Overview
+
+The first page is your overview. From here, you can quickly see deprecations of all urgencies and navigate to other pages.
+
+<RDimg screenshot="/img/docs/manuals/integration-dashboard/overview.png"/>
+
+## Environments
+
+The environments page shows all environments that you, as a customer, have available.
+
+<RDimg screenshot="/img/docs/manuals/integration-dashboard/environments.png"/>
+
+## EVA Apps
+
+The EVA apps screen reflects your situation regarding EVA applications. It shows you the current development and latest production version numbers, as well as your adoption rate of these versions.
+
+<RDimg screenshot="/img/docs/manuals/integration-dashboard/internalapps.png"/>
+
+## External Apps
+
+The External apps screen reflects your situation regarding external applications. An external application is any form of request that EVA receives with an `EVA-User-Agent` header specified as `application/versionnumber`. These are logged as 'applications'. Any request that contains any form of deprecations will be logged under these applications so you can act accordingly.
+
+<RDimg screenshot="/img/docs/manuals/integration-dashboard/externalapps.png"/>
+
+Clicking any of these applications shows the current pending deprecations that are still being used by that specific application, along with their urgency and time remaining until the deprecations should be fixed.
+
+<RDimg screenshot="/img/docs/manuals/integration-dashboard/deprecations.png"/>

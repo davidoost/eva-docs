@@ -1,0 +1,116 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Flag enums
+
+**EVA makes use of flagged enums to ensure values are sent and stored as efficiently as possible. If you would like to know more about how exactly EVA makes use of enums - or if could use a general refresher - we've got you covered.**
+
+## Problem
+
+Imagine you have a bunch of yes/no properties on a model, and you want to communicate about them in a JSON format between different systems.
+
+At first hand, you might suggest a list of properties in the format of "IsSomething" and giving them either a *true* or *false* value;
+
+```json 
+{
+  "ID": 123,
+  "IsStock": true,
+  "IsInsurance": false,
+  "IsMarketing": false,
+  "IsGiftCard": false
+  ...
+}
+```
+
+This list is easy to understand and perfectly readable for humans. But, this list will continue to grow and grow as new boolean properties emerge, and the size of the model keeps increasing over time. For larger models, this can take up precious memory space and consume traffic. And remember: this communication is not intended for humans - *it is intended for computers*.
+
+## Solution
+
+So we chose a way to communicate such properties by means of "flag enums", which brings communication to a binary level, which is something computers excel at. For humans, though, it's a little less intuitive, especially if binary is new for you.
+
+Imagine the above properties are given a value - the first number is the decimal value, and the second number is the same value in binary:
+
+
+```json title="Values in binary"
+  IsStock       1    0001
+  IsInsurance   2    0010
+  IsMarketing   4    0100
+  IsGiftCard    8    1000
+```
+
+These definitions are exposed through `GetEnumValues` and usually directly available from your SDK. With these definitions, we can now communicate the same information as above, but in a much more efficient way:
+
+```json title="Enums in practice"
+{
+  "ID": 123,
+  "Type": 1
+}
+```
+:::tip Matching the property name
+When you have a property with an enum value in your service call, that property isn't necessarily the right name to look for in the `GetEnumValues` call. 
+
+To take an example: `GetOrder` has the **Characteristics** property, which has an enum value that defines what kind of order it is. To read the order types behind the enum values however, you'd have to enter **OrderProperties** in `GetEnumValues`. 
+
+To check this specific example for yourself, see the [GetOrder call in the API Reference section](/documentation/api-reference/GetOrder). The last part behind your property shows the right property to use: "Characteristics": "EVA.Core.DataModels.**OrderProperties**".
+:::
+
+
+If you want to combine *IsStock (1)* and *IsMarketing (4)*, you can simply take the sum of both values, so **Type** would equal 5.
+
+In decimals, summing is done using ADD (+), and in binary you'd use an OR statement (|):
+
+
+```json title="Example of OR statement in binary"
+  0001      1
+  0100      4
+  ---- |   -- +
+  0101      5
+```
+
+Things get a little confusing when humans want to compare properties, let's say you want to know if **Type** with value 5 'contains' the flag *IsStock*.
+
+In decimals, this wouldn't really make sense, but in binary it's a simple AND statement (&):
+
+```json title="Example of AND statement in binary "
+  0101
+  0001
+  ---- &
+  0001
+```
+
+If the outcome value is > 0, then apparently this *IsStock* flag is present in the **Type** value!
+
+In your common programming language, assuming the flags are in an enum called **ProductTypes** and your model as product, a generic if-statement to check if a product has *IsStock* would look like this:
+
+```json title="Example of IF statement in common programming language"
+  if(product.Type & ProductTypes.IsStock > 0)
+  {
+    ...
+  }
+```
+
+## Practical examples
+
+It's important to use binary operators, such as the & and |. This opens up so many possibilities!
+
+<Tabs>
+<TabItem value="json1" label="A product that is either IsStock or IsMarketing">
+
+```json
+product.Type & (ProductTypes.IsStock | ProductTypes.IsMarketing) > 0
+```
+
+</TabItem>
+<TabItem value="json2" label="Both IsStock and IsMarketing">
+
+```json
+product.Type & (ProductTypes.IsStock | ProductTypes.IsMarketing) == (ProductTypes.IsStock | ProductTypes.IsMarketing)
+
+```
+
+</TabItem>
+</Tabs>
+
+:::tip Easy deciphering
+We're currently making a tool for you to use on our docs pages to easily decipher enum values into their smaller parts, but in the meantime: you can use nifty tools such as this one created by one of our awesome devs: [factorize](https://vdwel.me/factorize.html). 
+:::
