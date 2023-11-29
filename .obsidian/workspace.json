@@ -21,7 +21,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/Document1.md",
+                "file": "documentation/Document1.md",
                 "mode": "source",
                 "source": false
               }
@@ -33,7 +33,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/Document2.md",
+                "file": "documentation/Document2.md",
                 "mode": "source",
                 "source": false
               }
@@ -106,7 +106,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "docs/Document2.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -123,7 +122,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "docs/Document2.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -146,7 +144,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/Document2.md"
+                "file": "Untitled.md"
               }
             }
           }
@@ -167,10 +165,13 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "b4fef9888b76165a",
+  "active": "fa69f0e7f797df22",
   "lastOpenFiles": [
-    "docs/Document1.md",
-    "docs/Document2.md",
+    "Untitled",
+    "developers",
+    "documentation/Document2.md",
+    "Untitled.md",
+    "documentation/Document1.md",
     "docs/problem-indicators.mdx copy",
     "docs/introduction.mdx copy",
     "docs/integration-dashboard.mdx copy",
@@ -179,7 +180,6 @@
     "docs/dora.mdx copy",
     "docs/common-properties.mdx copy",
     "docs/authentication.mdx copy",
-    "docs/translations.mdx copy",
-    "docs"
+    "docs/translations.mdx copy"
   ]
 }
